@@ -22,7 +22,7 @@ class Logging:
     :method func_log(str): decorator that logs the start and end of a func call, logs the func documentation and possible runtime errors
     """
 
-    def __init__(self,name:str, file_name:str = None, file_mode:str = 'w+', logging_level:str = 'WARNING', console_output:boolean = True):
+    def __init__(self,name:str, file_name:str = None, file_mode:str = 'w+', logging_level:str = 'WARNING', console_output:bool = True):
         """
         init function of class Logging
         :param name: str: designation of the logger
