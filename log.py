@@ -3,16 +3,19 @@ import os.path
 from os import path
 from datetime import datetime
 
+
 class Logging:
     """
-    A class representing a logger
+    Lightweight Logger for python
 
+    parameters
     :param name: str: designation of the logger
     :param file_name: str: path and name of the logfile
     :param file_mode: str: file access modes
-    :param logging_level str: logging level
+    :param logging_level: str: logging level
     :param console_output: boolean: activate/deactivate console output
 
+    methods
     :method set_datetime_format(str): set the datetime format
     :method debug(str): logs to level DEBUG
     :method info(str): logs to level INFO
@@ -22,30 +25,73 @@ class Logging:
     :method func_log(str): decorator that logs the start and end of a func call, logs the func documentation and possible runtime errors
     """
 
-    def __init__(self,name:str, file_name:str = None, file_mode:str = 'w+', logging_level:str = 'WARNING', console_output:bool = True):
+    def __init__(self, name: str, file_name: str = None, file_mode: str = 'w+', logging_level: str = 'WARNING', console_output: bool = True):
         """
         init function of class Logging
         :param name: str: designation of the logger
         :param file_name: str: path and name of the logfile
         :param file_mode: str: file access modes
-        :param logging_level str: logging level
+        :param logging_level: str: logging level
         :param console_output: boolean: activate/deactivate console output
         """
-        self.name = name
-        self.file_name = file_name
-        self.file_mode = file_mode
-        self.logging_level = logging_level
-        self.console_output = console_output
-        self.datetime_format = '%Y-%m-%d:%H:%M:%S'
+        self.date_time_format = '%Y-%m-%d:%H:%M:%S'
         self.exception_log_level = 'WARNING'
         self.se_log_level = 'DEBUG'
         self.info_log_level = 'INFO'
-        self._create_logfile()
+        if self._validate_init(name, file_name, file_mode, logging_level, console_output):
+            self.name = name
+            self.file_name = file_name
+            self.file_mode = file_mode
+            self.logging_level = logging_level
+            self.console_output = console_output
+            self._create_logfile()
+
+    @staticmethod
+    def _validate_init(name: str, file_name: str, file_mode: str, logging_level: str, console_output: bool):
+        if not isinstance(name, str):
+            raise TypeError('name can not be {} it has to be {}.'.format(type(name), str))
+        if not isinstance(file_name, str) and file_name is not None:
+            raise TypeError('file_name can not be {} it has to be {} or {}'.format(type(file_name), str, type(None)))
+        if not isinstance(file_mode, str):
+            raise TypeError('file_mode can not be {} it has to be {}'.format(type(file_name), str))
+        if file_mode not in ['w', 'a']:
+            raise ValueError('file_mode can not be {}, it has to be "w" or or "a"'.format(file_mode))
+        if not isinstance(logging_level, str):
+            raise TypeError('logging_level can not be {} it has to be {}'.format(type(file_name), str))
+        if logging_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
+            raise ValueError('logging_level can not be {}, it has to be "DEBUG", "INFO", "WARNING", "ERROR" or "CRITICAL"'.format(logging_level))
+        if not isinstance(console_output, bool):
+            raise TypeError('console_output can not be {} it has to be {}'.format(type(console_output), bool))
+        return True
+
+    @staticmethod
+    def _prepare_message(name: str, level: str, date_time: str, message: str):
+        """
+        prepares and returns the message
+        :param level: str: logging level as
+        :param date_time: str: actual datetime
+        :param message: str: message
+        :return: str: log entry
+        """
+        return date_time + ':' + name + ':' + level + ':' + message + '\n'
+
+    @staticmethod
+    def _any_to_str(message: any):
+        """
+        tries to convert any type to string
+        :param message: any: message
+        :return: validated_message: message
+        """
+        try:
+            validated_message = str(message)
+            return validated_message
+        except TypeError:
+            print('{} can not be converted to {}'.format(type(message), str))
 
     def _is_file(self):
         """
         check if logfile is activated
-        :return: boolean: activated/deactivated
+        :return: bool: activated/deactivated
         """
         if self.file_name:
             return True
@@ -61,7 +107,7 @@ class Logging:
                 if os.stat(self.file_name).st_size != 0 and self.file_mode == 'a' or 'a+':
                     with open(self.file_name, self.file_mode) as f:
                         f.write('')
-                elif self.mode == 'w' or 'w+':
+                elif self.file_mode == 'w' or 'w+':
                     with open(self.file_name, self.file_mode) as f:
                         f.write('The log ' + self.name + ' was created on ' + self._get_date_time() + '\n\n')
             else:
@@ -69,53 +115,43 @@ class Logging:
                     f.write('The log ' + self.name + ' was created on ' + self._get_date_time() + '\n\n')
         return
 
-    def _prepare_message(self, level:int, datetime:datetime, message:str):
-        """
-        prepares and returns the message
-        :param level: int: logging level representation as int
-        :param datetime: datetime: actual datetime
-        :param message: str: message
-        :return: str: prepared message
-        """
-        return str(datetime + ':' + level + ':' + message + '\n')
-
-    def _write_logfile(self, level:int, datetime:datetime, message:str):
+    def _write_logfile(self, name: str, level: str, date_time: str, message: str):
         """
         writes the message to the logfile
-        :param level: int: logging level representation as int
-        :param datetime: datetime: actual datetime
-        :param message: str: message
+        :param level: str: logging level
+        :param date_time: str: actual datetime
+        :param message: str: log entry
         :return: boolean: True
         """
         if self._is_file():
             with open(self.file_name, 'a') as f:
-                f.write(self._prepare_message(level, datetime, message))
-        return
+                f.write(self._prepare_message(name, level, date_time, message))
+        return True
 
-    def _print_log(self, level:int, datetime:datetime, message:str):
+    def _print_log(self, name: str, level: str, date_time: str, message: str):
         """
         prints the message to the console
-        :param level: int: logging level representation as int
-        :param datetime: datetime: actual datetime
+        :param level: str: logging level
+        :param date_time: str: actual datetime
         :param message: str: message
         :return: boolean: True
         """
         if self.console_output:
-            print(self._prepare_message(level, datetime, message))
-        return
+            print(self._prepare_message(name, level, date_time, message))
+        return True
 
     def _get_date_time(self):
         """
         returns the actual datetime
-        :return: datetime: actual datetime
+        :return: str: actual datetime
         """
-        return str(datetime.now().strftime(self.datetime_format))
+        return str(datetime.now().strftime(self.date_time_format))
 
-    def _level_interpreter(self, level:str):
+    def _level_interpreter(self, level: str):
         """
-        takes logging level as a string and calculates if message should be logged
+        takes logging level as a string and decides if message should be logged
         :param level: str: logging level
-        :return: boolean: log/nlog
+        :return: bool: log/nlog
         """
         translate = {
             'DEBUG': 0,
@@ -130,9 +166,8 @@ class Logging:
             return True
         return False
 
-    def _direct_to_log_level(self, level:str):
+    def _direct_to_log_level(self, level: str):
         """
-        ck
         checks to which level a message should be assigned
         :param level: str: logging level
         :return: func: logging function
@@ -147,74 +182,79 @@ class Logging:
         }
         return redirection[level]
 
-    def set_datetime_format(self, format:str):
+    def set_datetime_format(self, date_time_format: str):
         """
         set the datetime format
-        :param format: str: format of the datetime
-        :return: boolean: True
+        :param date_time_format: str: format of the datetime
+        :return: bool: True
         """
-        self.datetime_format = format
-        return
+        self.date_time_format = date_time_format
+        return True
 
-    def debug(self, message:str):
+    def debug(self, message: str):
         """
         logs to level DEBUG
         :param message: str: message
-        :return: boolean: True
+        :return: bool: True
         """
         level = 'DEBUG'
+        message = self._any_to_str(message)
         if self._level_interpreter(level):
-            self._write_logfile(level, self._get_date_time(), message)
-        self._print_log(level, self._get_date_time(), message)
-        return
+            self._write_logfile(self.name, level, self._get_date_time(), message)
+        self._print_log(self.name, level, self._get_date_time(), message)
+        return True
 
-    def info(self, message:str):
+    def info(self, message: any):
         """
         logs to level INFO
-        :param message: str: message
-        :return: boolean: True
+        :param message: any: message
+        :return: bool: True
         """
         level = 'INFO'
+        message = self._any_to_str(message)
         if self._level_interpreter(level):
-            self._write_logfile(level, self._get_date_time(), message)
-        self._print_log(level, self._get_date_time(), message)
-        return
+            self._write_logfile(self.name, level, self._get_date_time(), message)
+        self._print_log(self.name, level, self._get_date_time(), message)
+        return True
 
-    def warning(self, message:str):
+    def warning(self, message: any):
         """
         logs to level WARNING
-        :param message: str: message
-        :return: boolean: True
+        :param message: any: message
+        :return: bool: True
         """
         level = 'WARNING'
+        message = self._any_to_str(message)
         if self._level_interpreter(level):
-            self._write_logfile(level, self._get_date_time(), message)
-        self._print_log(level, self._get_date_time(), message)
-        return
+            self._write_logfile(self.name, level, self._get_date_time(), message)
+        self._print_log(self.name, level, self._get_date_time(), message)
+        return True
 
-    def error(self, message:str):
+    def error(self, message: any):
         """
         logs to level ERROR
-        :param message: str: message
-        :return: boolean: True
+        :param message: any: message
+        :return: bool: True
         """
         level = 'ERROR'
+        message = self._any_to_str(message)
         if self._level_interpreter(level):
-            self._write_logfile(level, self._get_date_time(), message)
-        self._print_log(level, self._get_date_time(), message)
-        return
+            self._write_logfile(self.name, level, self._get_date_time(), message)
+        self._print_log(self.name, level, self._get_date_time(), message)
+        return True
 
-    def critical(self, message:str):
+    def critical(self, message: str):
         """
         logs to level CRITICAL
         :param message: str: message
-        :return: boolean: True
+        :return: bool: True
         """
         level = 'CRITICAL'
+        message = self._any_to_str(message)
         if self._level_interpreter(level):
-            self._write_logfile(level, self._get_date_time(), message)
-        self._print_log(level, self._get_date_time(), message)
-        return
+            self._write_logfile(self.name, level, self._get_date_time(), message)
+        self._print_log(self.name, level, self._get_date_time(), message)
+        return True
 
     def func_log(self, func):
         """
