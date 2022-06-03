@@ -1,5 +1,4 @@
 import functools
-import os.path
 from os import path
 from datetime import datetime
 
@@ -7,6 +6,9 @@ from datetime import datetime
 class Logging:
     """
     Lightweight Logger for python
+    Version: 0.9.1
+    Last Update: 03.06.2022
+    Developer: XO30
 
     parameters
     :param name: str: designation of the logger
@@ -97,23 +99,28 @@ class Logging:
             return True
         return False
 
+    def _check_logfile(self):
+        """
+        checks if logfile exists and creates one if not
+        :return: bool: True
+        """
+        if path.exists(self.file_name):
+            return True
+        else:
+            open(self.file_name, 'w+')
+            return True
+
     def _create_logfile(self):
         """
-        checks for file access modes, creates logfile if not existing, generates an initial comment
-        :return: boolean: True
+        if necessary creates the logfile while initializing
+        :return: bool: True
         """
-        if self._is_file():
-            if path.exists(self.file_name):
-                if os.stat(self.file_name).st_size != 0 and self.file_mode == 'a' or 'a+':
-                    with open(self.file_name, self.file_mode) as f:
-                        f.write('')
-                elif self.file_mode == 'w' or 'w+':
-                    with open(self.file_name, self.file_mode) as f:
-                        f.write('The log ' + self.name + ' was created on ' + self._get_date_time() + '\n\n')
-            else:
-                with open(self.file_name, 'w+') as f:
-                    f.write('The log ' + self.name + ' was created on ' + self._get_date_time() + '\n\n')
-        return
+        if path.exists(self.file_name):
+            if self.file_mode == 'w':
+                open(self.file_name, 'w+')
+        else:
+            open(self.file_name, 'w+')
+        return True
 
     def _write_logfile(self, name: str, level: str, date_time: str, message: str):
         """
@@ -123,7 +130,7 @@ class Logging:
         :param message: str: log entry
         :return: boolean: True
         """
-        if self._is_file():
+        if self._is_file() and self._check_logfile():
             with open(self.file_name, 'a') as f:
                 f.write(self._prepare_message(name, level, date_time, message))
         return True
