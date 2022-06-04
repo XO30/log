@@ -6,18 +6,18 @@ from datetime import datetime
 class Logging:
     """
     Lightweight Logger for python
-    Version: 0.9.1
-    Last Update: 03.06.2022
+    Version: 0.9.2
+    Last Update: 04.06.2022
     Developer: XO30
 
-    parameters
+    Parameters
     :param name: str: designation of the logger
     :param file_name: str: path and name of the logfile
     :param file_mode: str: file access modes
     :param logging_level: str: logging level
     :param console_output: boolean: activate/deactivate console output
 
-    methods
+    Methods
     :method set_datetime_format(str): set the datetime format
     :method debug(str): logs to level DEBUG
     :method info(str): logs to level INFO
@@ -29,7 +29,7 @@ class Logging:
 
     def __init__(self, name: str, file_name: str = None, file_mode: str = 'w+', logging_level: str = 'WARNING', console_output: bool = True):
         """
-        init function of class Logging
+        init method of class Logging
         :param name: str: designation of the logger
         :param file_name: str: path and name of the logfile
         :param file_mode: str: file access modes
@@ -48,8 +48,50 @@ class Logging:
             self.console_output = console_output
             self._create_logfile()
 
+    def __repr__(self):
+        """
+        repr method of class Logger
+        :return: str: str representation of class
+        """
+        rep = 'log.Logger({}, {}, {}, {}, {})'.format(
+            self.name,
+            self.file_name,
+            self.file_mode,
+            self.logging_level,
+            self.console_output
+        )
+        return rep
+
+    def __str__(self):
+        """
+        str method of class Logger
+        :return: str: Information about Logger
+        """
+        title = ' \033[1m' + 'Logger detail' + '\033[0m\n'
+        info = (
+            ' name: {}\n'.format(self.name),
+            'file_name: {}\n'.format(self.file_name),
+            'file_mode: {}\n'.format(self.file_mode),
+            'logging_level: {}\n'.format(self.logging_level),
+            'console_output: {}\n'.format(self.console_output),
+            'date_time_format: {}\n'.format(self.date_time_format),
+            'exception_log_level: {}\n'.format(self.exception_log_level),
+            'se_log_level: {}\n'.format(self.se_log_level),
+            'info_log_level: {}\n'.format(self.info_log_level)
+        )
+        return title + ' '.join(info)
+
     @staticmethod
     def _validate_init(name: str, file_name: str, file_mode: str, logging_level: str, console_output: bool):
+        """
+        validation of user inputs
+        :param name: str: designation of the logger
+        :param file_name: str: path and name of the logfile
+        :param file_mode: str: file access modes
+        :param logging_level: str: logging level
+        :param console_output: boolean: activate/deactivate console output
+        :return: bool: True
+        """
         if not isinstance(name, str):
             raise TypeError('name can not be {} it has to be {}.'.format(type(name), str))
         if not isinstance(file_name, str) and file_name is not None:
@@ -185,7 +227,7 @@ class Logging:
             'WARNING': self.warning,
             'ERROR': self.error,
             'CRITICAL': self.critical,
-            'NONE': None
+            None: None
         }
         return redirection[level]
 
