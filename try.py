@@ -6,3 +6,7 @@ log.info('das')
 log.warning('ist')
 log.error('ein')
 log.critical('test')
+
+
+print(log)
+print(repr(log))

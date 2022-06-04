@@ -6,18 +6,18 @@ from datetime import datetime
 class Logging:
     """
     Lightweight Logger for python
-    Version: 0.9.1
-    Last Update: 03.06.2022
+    Version: 0.9.2
+    Last Update: 04.06.2022
     Developer: XO30
 
-    parameters
+    Parameters
     :param name: str: designation of the logger
     :param file_name: str: path and name of the logfile
     :param file_mode: str: file access modes
     :param logging_level: str: logging level
     :param console_output: boolean: activate/deactivate console output
 
-    methods
+    Methods
     :method set_datetime_format(str): set the datetime format
     :method debug(str): logs to level DEBUG
     :method info(str): logs to level INFO
@@ -47,6 +47,42 @@ class Logging:
             self.logging_level = logging_level
             self.console_output = console_output
             self._create_logfile()
+
+    def __repr__(self):
+        rep = 'log.Logger({}, {}, {}, {}, {})'.format(
+            self.name,
+            self.file_name,
+            self.file_mode,
+            self.logging_level,
+            self.console_output
+        )
+        return rep
+
+    def __str__(self):
+        title = ' \033[1m' + 'Logger detail' + '\033[0m\n'
+        description = """
+        name: {}
+        file_name: {}
+        file_mode: {}
+        self.logging_level: {}
+        self.console_output: {}
+        
+        date_time_format: {}
+        exception_log_level: {}
+        se_log_level: {}
+        self.info_log_level: {}
+        """.format(
+            self.name,
+            self.file_name,
+            self.file_mode,
+            self.logging_level,
+            self.console_output,
+            self.date_time_format,
+            self.exception_log_level,
+            self.se_log_level,
+            self.info_log_level
+        )
+        return title + description
 
     @staticmethod
     def _validate_init(name: str, file_name: str, file_mode: str, logging_level: str, console_output: bool):
