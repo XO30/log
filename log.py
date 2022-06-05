@@ -6,8 +6,8 @@ from datetime import datetime
 class Logging:
     """
     Lightweight Logger for python
-    Version: 0.9.2
-    Last Update: 04.06.2022
+    Version: 0.9.3
+    Last Update: 05.06.2022
     Developer: XO30
 
     Parameters
@@ -27,7 +27,7 @@ class Logging:
     :method func_log(str): decorator that logs the start and end of a func call, logs the func documentation and possible runtime errors
     """
 
-    def __init__(self, name: str, file_name: str = None, file_mode: str = 'w+', logging_level: str = 'WARNING', console_output: bool = True):
+    def __init__(self, name: str, file_name: str = None, file_mode: str = 'w', logging_level: str = 'WARNING', console_output: bool = True):
         """
         init method of class Logging
         :param name: str: designation of the logger
@@ -318,12 +318,12 @@ class Logging:
                 se_func = self._direct_to_log_level(self.se_log_level)
                 info_func = self._direct_to_log_level(self.info_log_level)
                 if se_func is not None:
-                    se_func('About to run %s' % func.__name__)
+                    se_func('Enter: %s' % func.__name__)
                 if func.__doc__ and info_func is not None:
                     info_func(func.__doc__)
                 result = func(*args, **kwargs)
                 if se_func is not None:
-                    se_func('Done running %s' % func.__name__)
+                    se_func('Exit: %s' % func.__name__)
                 return result
             except Exception as e:
                 if error_func is not None:
