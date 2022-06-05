@@ -24,7 +24,7 @@ log = log.Logging('example', file_name='example.log', file_mode='w', logging_lev
 from log import Logging
 log = Logging('example', file_name='example.log', file_mode='w', logging_level='DEBUG', console_output=True)
 ```
-<p>name is a designation of the logger. file_name contains the document name and path. file_name can also be initialized with None. in this case no logfile is created. file_mode designates the write mode. "a" means that entries are added to the document, "w" causes the old logfile to be overwritten when the class is reinitialized. logging_level determines which messages are added to the logfile. Debug means that all messages are also written to the logfile. console_output specifies whether the messages should also be output to the console.</p>
+<p>name is a designation of the logger. file_name contains the document name and path. file_name can also be initialized with None. in this case no logfile is created. file_mode designates the write mode. "a" means that entries are added to the document, "w" causes the old logfile to be overwritten when the class is reinitialized. logging_level determines which messages are added to the logfile. Debug means that all messages are written to the logfile. console_output specifies whether the messages should also be output to the console.</p>
 
 
 <p><b>Get some information about the logger:</b></p>
@@ -41,7 +41,7 @@ print(log)
 log.debug('hello')
 log.info('this')
 log.warning('is')
-log.info('a')
+log.error('an')
 log.critical('example')
 ```
 
@@ -52,11 +52,12 @@ log.critical('example')
 @log.func_log
 def square(x):
     """
-    function to square a int
+    function to square an int
     :param x: int: input nr.
     :return: int: output nr.
     """
     return x ** 2
+
 
 square(5)
 ```
